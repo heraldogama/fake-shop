@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:13.16
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_PASSWORD
+              value: Pg1234
+            - name: POSTGRES_USER
+              value: ecommerce
+            - name: POSTGRES_DB
+              value: ecommerce
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+  selector:
+    app: postgres
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fakeshop
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: fakeshop
+  template:
+    metadata:
+      labels:
+        app: fakeshop
+    spec:
+      containers:
+        - name: fakeshop
+          image: heraldogamadev/fake-shop:v3
+          ports:
+            - containerPort: 5000
+          env:
+            - name: DB_HOST
+              value: postgres
+            - name: DB_USER
+              value: ecommerce
+            - name: DB_PASSWORD
+              value: Pg1234
+            - name: DB_NAME
+              value: ecommerce
+            - name: FLASK_APP
+              value: index.py
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fakeshop
+spec:
+  type: LoadBalancer # usar NodePort em ambiente local
+  ports:
+    - port: 80 # porta alterada de 5000 para 80 por nao ser um servico local
+      targetPort: 5000 # parametro adicionado para o serviço kubernete na DigitalOcean
+      nodePort: 30000
+  selector:
+    app: fakeshop
