@@ -24,21 +24,21 @@ jobs:
           tags: |
             heraldogamadev/fake-shop:v${{ github.run_number }}
             heraldogamadev/fake-shop
-
   CD:
     needs: [CI]
     runs-on: ubuntu-latest
     steps:
       - name: Obtendo o Codigo
         uses: actions/checkout@v4.2.2
-- uses: azure/k8s-set-context@v4
-  with:
-     method: kubeconfig
-     kubeconfig: ${{ secrets.K8S_CONFIG }}
- - uses: Azure/k8s-deploy@v5
-  with:
-     manifests: |
-        k8s/deployment.yaml
-     images: |
-        heraldogamadev/fake-shop:v${{ github.run_number }}
 
+      - uses: azure/k8s-set-context@v4
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.K8S_KUBECONFIG }}
+
+      - uses: Azure/k8s-deploy@v5
+        with:
+            manifests: |
+                k8s/deployment.yaml
+            images: |
+                heraldogamadev/fake-shop:v${{ github.run_number }}
