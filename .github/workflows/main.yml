@@ -21,10 +21,8 @@ jobs:
           context: ./src
           push: true
           file: ./src/Dockerfile
-          tags: heraldogamadev/fake-shop:v3
-          
-      - run: echo "Executar o Docker Build"
-      - run: echo "Enviar a imagem Docker para o Docker hub"
+          tags: heraldogamadev/fake-shop:v${{ github.run_number }}
+
   CD:
     needs: [CI]
     runs-on: ubuntu-latest
